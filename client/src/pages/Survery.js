@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import axios from 'axios'
+import React, { useState } from 'react';
+import axios from 'axios';
+import Recommendation from './Recommendation'
 
 const Survery = () => {
 
@@ -7,6 +8,8 @@ const Survery = () => {
   const [feeling, setFeeling] = useState();
   const [personality, setPersonality] = useState();
   const [videos, setVideos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('')
 
   const submit = async (e) => {
     e.preventDefault();
@@ -15,12 +18,17 @@ const Survery = () => {
             'Content-Type': 'application/json'
         }
     }
+    setIsLoading(true)
+    setErrorMsg('')
     const data = JSON.stringify({ word, feeling, personality })
     try {
         const res = await axios.post(`/api/generate-response`, data, config)
+        setIsLoading(false)
         setVideos(res.data.youtube.items)
     } catch (error) {
         console.log(error)
+        setIsLoading(false)
+        setErrorMsg('Something went wrong, please try again')
     }
   }
 
@@ -38,7 +46,7 @@ const Survery = () => {
 
   return (
     <div className="page-container container">
-        <form onSubmit={submit}>
+        <form className="mb-3" onSubmit={submit}>
             <h1 className="text-center">Survey</h1>
             <div className="form-group mb-4">
                 <label className="mb-2" htmlFor="word">Choose a word</label>
@@ -92,22 +100,15 @@ const Survery = () => {
             </div>
             <button type="submit" className="btn btn-primary">Submit</button>
         </form>
-        <div>
-            <h2>Videos</h2>
-            {videos?.length > 0 &&
-                videos.map((item, key) => (
-                    <iframe
-                        key={key}
-                        width="853"
-                        height="480"
-                        src={`https://www.youtube.com/embed/${item.id.videoId}`}
-                        allow="accelerometer; picture-in-picture"
-                        allowFullScreen
-                        title="Embedded youtube"
-                    />
-                ))
-            }
+        {errorMsg && <div className="text-danger">{errorMsg}</div>}
+        {isLoading ?  
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only"></span>
         </div>
+        : 
+        <Recommendation videos={videos} />
+
+        }
     </div>
   )
 }
