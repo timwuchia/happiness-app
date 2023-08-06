@@ -20,7 +20,7 @@ app.post('/api/generate-response', async (req, res) => {
         messages: [
             {
                 role: 'user',
-                content: `Come up with a YouTube search query given the user's ${feeling}, ${personality} and their chosen ${word}`
+                content: `Generate a Youtube search query for someone with a ${personality} personality type who has ${feeling} and currently wants some ${word}`
             }
         ],
         max_tokens: 30
